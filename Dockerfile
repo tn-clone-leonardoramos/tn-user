@@ -24,13 +24,13 @@ CMD ["npm", "run", "start:dev"]
 FROM base AS production
 
 # Compila el proyecto
-RUN npm run build
+RUN npm install && npm run build
 
-# Instala solo las dependencias necesarias para producción
-RUN npm ci --only=production
+# Elimina las dependencias de desarrollo si las hay
+RUN npm prune --production
 
 # Exponemos el puerto de la aplicación
-EXPOSE 3000
+EXPOSE 80
 
 # Comando para ejecutar en modo producción
 CMD ["npm", "run", "start:prod"]

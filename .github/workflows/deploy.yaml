@@ -72,9 +72,9 @@ jobs:
         id: update-ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          service: env.ECS_SERVICE
-          cluster: env.ECS_CLUSTER
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
           task-definition: taskdefinition.json
-          container-name: env.CONTAINER_NAME
+          container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
           wait-for-service-stability: true

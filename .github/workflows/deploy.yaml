@@ -60,13 +60,13 @@ jobs:
         run: |
           aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query taskDefinition > taskdefinition.json
 
-      # - name: new image in ECS taskdefinition
-      #   id: demo
-      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-      #   with:
-      #     task-definition: taskdefinition.json
-      #     container-name: env.CONTAINER_NAME
-      #     image: ${{ steps.check_files.outputs.**image** }}
+      - name: Update task definition with new image
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: taskdefinition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
 
       - name: Update ECS Service
         id: update-ecs
@@ -75,6 +75,4 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           task-definition: taskdefinition.json
-          container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
           wait-for-service-stability: true

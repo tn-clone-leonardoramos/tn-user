@@ -2,16 +2,21 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/commo
 
 import { AppService } from '@app/app.service'
 
-@Controller('/users')
+@Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
+  healthCheck() {
+    return
+  }
+
+  @Get('/users')
   getUsers(): Record<string, unknown>[] {
     return this.appService.getUsers()
   }
 
-  @Post()
+  @Post('/users')
   @HttpCode(HttpStatus.CREATED)
   createUser(@Body() user: Record<string, unknown>) {
     this.appService.createUser(user)

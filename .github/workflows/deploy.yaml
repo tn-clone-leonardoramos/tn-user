@@ -13,6 +13,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      # Solo ejecuta el deploy si se modifican estos archivos:
+      - 'src/**'
+      - 'package.json'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
 
 env:
   AWS_REGION: us-east-1 # set this to your preferred AWS region, e.g. us-west-1
@@ -56,14 +62,10 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+      # descarga el taskDefinition existente y lo guarda en un archivo json
       - name: Download task definition
         run: |
           aws ecs describe-task-definition --task-definition $TASK_DEFINITION --query taskDefinition > taskdefinition.json
-
-      - name: Show task definition before update
-        run: |
-          echo "Task definition before update:"
-          cat taskdefinition.json
 
       - name: Update image in task definition file
         run: |
@@ -82,11 +84,6 @@ jobs:
           task-definition-family: ${{ env.TASK_DEFINITION }}
           container-name: ${{ env.CONTAINER_NAME }}
           image: ${{ steps.build-image.outputs.image }}
-
-      - name: Show task definition after update
-        run: |
-          echo "Task definition after update:"
-          cat taskdefinition.json
 
       - name: Update ECS Service
         id: update-ecs
